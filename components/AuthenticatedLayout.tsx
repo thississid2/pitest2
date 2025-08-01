@@ -69,12 +69,12 @@ export default function AuthenticatedLayout({
   return (
     <>
       <AnimatedBlobs />
-      <SidebarProvider>
-        <Sidebar />
-        <main className="flex-1 min-h-screen p-6 relative z-10">
-          {children}
-        </main>
-      </SidebarProvider>
+      <div className="flex min-h-screen relative z-10">
+        <SidebarProvider>
+          <Sidebar />
+          <main className="flex-1 min-h-screen p-6">{children}</main>
+        </SidebarProvider>
+      </div>
     </>
   );
 }

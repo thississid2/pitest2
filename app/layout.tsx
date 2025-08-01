@@ -30,11 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${nunito.variable} ${arsenal.variable} antialiased flex relative overflow-x-hidden`}
+        className={`${nunito.variable} ${arsenal.variable} antialiased overflow-x-hidden`}
       >
-        <ClientWrapper>
-          {children}
-        </ClientWrapper>
+        <ClientWrapper>{children}</ClientWrapper>
       </body>
     </html>
   );

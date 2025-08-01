@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @keyframes pop-in {
   0% {
@@ -75,7 +76,9 @@
   position: absolute;
 }
 
-:root {
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-nunito-sans);
@@ -205,17 +208,9 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
-    outline-color: hsl(var(--ring) / 0.5);
+    @apply border-border outline-ring/50;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-foreground;
   }
-}
-
-/* Grid pattern for template previews */
-.bg-grid-pattern {
-  background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0);
-  background-size: 20px 20px;
 }
