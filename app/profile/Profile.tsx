@@ -1,41 +1,45 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import Card from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Calendar, 
-  Clock, 
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import Card from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  User,
+  Mail,
+  Shield,
+  Calendar,
+  Clock,
   LogOut,
   Settings,
   Edit,
   CheckCircle,
-  Phone,
-  BadgeCheck
-} from 'lucide-react';
+} from "lucide-react";
 
 interface UserProfile {
+  id: string;
   clientId: string;
   email: string;
   role: string;
-  firstName: string;
-  lastName: string;
-  createdAt: string;
-  lastLogin: string;
-  accountStatus: string;
-  phone: string;
-  emailVerified: boolean;
+  permissions?: any;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  status?: string;
+  mustChangePassword?: boolean;
+  accountInfo?: {
+    createdAt?: string;
+    lastLoginAt?: string;
+    failedLoginAttempts?: number;
+    totalLogins?: number;
+  };
 }
 
 const Profile = () => {
-  const { logout } = useAuth();
+  const { logout, fetchProfile: authFetchProfile } = useAuth();
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchProfile();
@@ -44,20 +48,40 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/auth/profile', {
-        credentials: 'include',
-      });
+      const result = await authFetchProfile();
 
-      if (response.ok) {
-        const data = await response.json();
-        setProfileData(data.user);
+      if (result.success) {
+        // The profile data is already set in the auth context
+        // Get the updated user data from the auth context
+        const token = localStorage.getItem("auth-token");
+        
+        if (token) {
+          const response = await fetch(
+            "https://jxnnviamig.execute-api.ap-south-1.amazonaws.com/profile",
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            setProfileData(data.user);
+          } else {
+            const errorData = await response.json();
+            setError(errorData.error || "Failed to fetch profile");
+          }
+        } else {
+          setError("No authentication token found");
+        }
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Failed to fetch profile');
+        setError(result.error || "Failed to fetch profile");
       }
     } catch (error) {
-      console.error('Profile fetch error:', error);
-      setError('Network error occurred');
+      console.error("Profile fetch error:", error);
+      setError("Network error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -66,45 +90,45 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      window.location.href = '/login';
+      window.location.href = "/login";
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
-      case 'admin':
-        return 'bg-red-100 text-red-800';
-      case 'manager':
-        return 'bg-blue-100 text-blue-800';
-      case 'user':
-        return 'bg-green-100 text-green-800';
+      case "admin":
+        return "bg-red-100 text-red-800";
+      case "manager":
+        return "bg-blue-100 text-blue-800";
+      case "user":
+        return "bg-green-100 text-green-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-red-100 text-red-800';
-      case 'suspended':
-        return 'bg-yellow-100 text-yellow-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-red-100 text-red-800";
+      case "suspended":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -126,10 +150,12 @@ const Profile = () => {
           <div className="text-red-500 mb-4">
             <User className="w-12 h-12 mx-auto" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Error Loading Profile
+          </h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={fetchProfile} 
+          <button
+            onClick={fetchProfile}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Try Again
@@ -146,7 +172,9 @@ const Profile = () => {
           <div className="text-gray-400 mb-4">
             <User className="w-12 h-12 mx-auto" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Profile Data</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            No Profile Data
+          </h2>
           <p className="text-gray-600">Unable to load profile information.</p>
         </Card>
       </div>
@@ -161,7 +189,9 @@ const Profile = () => {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile</h1>
-              <p className="text-gray-600">Manage your account information and settings</p>
+              <p className="text-gray-600">
+                Manage your account information and settings
+              </p>
             </div>
             <button
               onClick={handleLogout}
@@ -200,21 +230,12 @@ const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-gray-400" />
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Email Address</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        Email Address
+                      </p>
                       <div className="flex items-center space-x-2">
                         <p className="text-gray-900">{profileData.email}</p>
-                        {profileData.emailVerified && (
-                          <BadgeCheck className="w-4 h-4 text-green-500" />
-                        )}
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Phone Number</p>
-                      <p className="text-gray-900">{profileData.phone || 'Not provided'}</p>
                     </div>
                   </div>
 
@@ -223,7 +244,8 @@ const Profile = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-500">Role</p>
                       <Badge className={getRoleColor(profileData.role)}>
-                        {profileData.role.charAt(0).toUpperCase() + profileData.role.slice(1)}
+                        {profileData.role.charAt(0).toUpperCase() +
+                          profileData.role.slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -231,9 +253,18 @@ const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="w-5 h-5 text-gray-400" />
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Account Status</p>
-                      <Badge className={getStatusColor(profileData.accountStatus)}>
-                        {profileData.accountStatus.charAt(0).toUpperCase() + profileData.accountStatus.slice(1)}
+                      <p className="text-sm font-medium text-gray-500">
+                        Account Status
+                      </p>
+                      <Badge
+                        className={getStatusColor(
+                          profileData.status || "active"
+                        )}
+                      >
+                        {(profileData.status || "active")
+                          .charAt(0)
+                          .toUpperCase() +
+                          (profileData.status || "active").slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -243,25 +274,39 @@ const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <User className="w-5 h-5 text-gray-400" />
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Client ID</p>
-                      <p className="text-gray-900 font-mono text-sm">{profileData.clientId}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        Client ID
+                      </p>
+                      <p className="text-gray-900 font-mono text-sm">
+                        {profileData.clientId}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <Calendar className="w-5 h-5 text-gray-400" />
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Member Since</p>
-                      <p className="text-gray-900">{formatDate(profileData.createdAt)}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        Member Since
+                      </p>
+                      <p className="text-gray-900">
+                        {profileData.accountInfo?.createdAt
+                          ? formatDate(profileData.accountInfo.createdAt)
+                          : "N/A"}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <Clock className="w-5 h-5 text-gray-400" />
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Last Login</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        Last Login
+                      </p>
                       <p className="text-gray-900">
-                        {profileData.lastLogin ? formatDate(profileData.lastLogin) : 'Never'}
+                        {profileData.accountInfo?.lastLoginAt
+                          ? formatDate(profileData.accountInfo.lastLoginAt)
+                          : "Never"}
                       </p>
                     </div>
                   </div>
@@ -274,7 +319,9 @@ const Profile = () => {
           <div className="space-y-6">
             {/* Account Actions */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Actions</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Account Actions
+              </h3>
               <div className="space-y-3">
                 <button className="w-full flex items-center justify-start space-x-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <Settings className="w-4 h-4" />
@@ -284,7 +331,7 @@ const Profile = () => {
                   <Shield className="w-4 h-4" />
                   <span>Security Settings</span>
                 </button>
-                <button 
+                <button
                   className="w-full flex items-center justify-start space-x-2 px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
                   onClick={handleLogout}
                 >
@@ -296,7 +343,9 @@ const Profile = () => {
 
             {/* Account Summary */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Summary</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Account Summary
+              </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Account Type:</span>
@@ -304,13 +353,17 @@ const Profile = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Status:</span>
-                  <Badge className={getStatusColor(profileData.accountStatus)}>
-                    {profileData.accountStatus}
+                  <Badge
+                    className={getStatusColor(profileData.status || "active")}
+                  >
+                    {profileData.status || "active"}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Client ID:</span>
-                  <span className="font-mono text-xs">{profileData.clientId.slice(0, 8)}...</span>
+                  <span className="font-mono text-xs">
+                    {profileData.clientId.slice(0, 8)}...
+                  </span>
                 </div>
               </div>
             </Card>

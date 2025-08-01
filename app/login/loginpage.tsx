@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +25,9 @@ export default function LoginPage() {
     if (!result.success) {
       setError(result.error || "Login failed");
     } else {
-      // Redirect to home page on successful login
-      window.location.href = "/";
+      // Use Next.js router for navigation
+      router.push("/");
+      router.refresh(); // Force a refresh to update auth state
     }
 
     setIsLoading(false);

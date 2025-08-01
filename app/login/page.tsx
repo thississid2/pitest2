@@ -1,30 +1,33 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     const result = await login(email, password);
 
     if (!result.success) {
-      setError(result.error || 'Login failed');
+      setError(result.error || "Login failed");
     } else {
-      // Redirect to home page on successful login
-      window.location.href = '/';
+      // Use Next.js router for navigation
+      router.push("/");
+      router.refresh(); // Force a refresh to update auth state
     }
 
     setIsLoading(false);
@@ -41,13 +44,17 @@ export default function LoginPage() {
               <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Signing you in</h3>
-              <p className="text-sm text-gray-600">Please wait while we verify your credentials...</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                Signing you in
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please wait while we verify your credentials...
+              </p>
             </div>
           </div>
         </div>
       )}
-      
+
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-xl rounded-xl border">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
@@ -67,7 +74,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
@@ -81,7 +93,12 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
+              Password
+            </Label>
             <Input
               id="password"
               type="password"
@@ -96,8 +113,16 @@ export default function LoginPage() {
 
           {error && (
             <div className="p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
-              <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span>{error}</span>
             </div>
@@ -108,14 +133,17 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Forgot your password?{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+            Forgot your password?{" "}
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
               Reset it here
             </a>
           </p>
