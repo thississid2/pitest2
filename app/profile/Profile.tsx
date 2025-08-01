@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Card from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,67 +16,18 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-interface UserProfile {
-  id: string;
-  clientId: string;
-  email: string;
-  role: string;
-  permissions?: any;
-  firstName?: string;
-  lastName?: string;
-  fullName?: string;
-  status?: string;
-  mustChangePassword?: boolean;
-  accountInfo?: {
-    createdAt?: string;
-    lastLoginAt?: string;
-    failedLoginAttempts?: number;
-    totalLogins?: number;
-  };
-}
-
 const Profile = () => {
-  const { logout, fetchProfile: authFetchProfile } = useAuth();
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { logout, fetchProfile: authFetchProfile, user, isLoading: authLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError("");
       const result = await authFetchProfile();
 
-      if (result.success) {
-        // The profile data is already set in the auth context
-        // Get the updated user data from the auth context
-        const token = localStorage.getItem("auth-token");
-        
-        if (token) {
-          const response = await fetch(
-            "https://jxnnviamig.execute-api.ap-south-1.amazonaws.com/profile",
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            setProfileData(data.user);
-          } else {
-            const errorData = await response.json();
-            setError(errorData.error || "Failed to fetch profile");
-          }
-        } else {
-          setError("No authentication token found");
-        }
-      } else {
+      if (!result.success) {
         setError(result.error || "Failed to fetch profile");
       }
     } catch (error) {
@@ -85,7 +36,14 @@ const Profile = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [authFetchProfile]);
+
+  useEffect(() => {
+    // Only fetch if we don't have user data and we're not already loading
+    if (!user && !authLoading) {
+      fetchProfile();
+    }
+  }, [user, authLoading, fetchProfile]);
 
   const handleLogout = async () => {
     try {
@@ -132,11 +90,11 @@ const Profile = () => {
     }
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-200 rounded-full border-t-blue-600 animate-spin mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -145,27 +103,21 @@ const Profile = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 max-w-md w-full text-center">
-          <div className="text-red-500 mb-4">
-            <User className="w-12 h-12 mx-auto" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Error Loading Profile
-          </h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={fetchProfile}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Try Again
+            Retry
           </button>
-        </Card>
+        </div>
       </div>
     );
   }
 
-  if (!profileData) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="p-8 max-w-md w-full text-center">
@@ -214,9 +166,9 @@ const Profile = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-semibold text-gray-900">
-                      {profileData.firstName} {profileData.lastName}
+                      {user.firstName} {user.lastName}
                     </h2>
-                    <p className="text-gray-600">{profileData.email}</p>
+                    <p className="text-gray-600">{user.email}</p>
                   </div>
                 </div>
                 <button className="flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -234,7 +186,7 @@ const Profile = () => {
                         Email Address
                       </p>
                       <div className="flex items-center space-x-2">
-                        <p className="text-gray-900">{profileData.email}</p>
+                        <p className="text-gray-900">{user.email}</p>
                       </div>
                     </div>
                   </div>
@@ -243,9 +195,9 @@ const Profile = () => {
                     <Shield className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-500">Role</p>
-                      <Badge className={getRoleColor(profileData.role)}>
-                        {profileData.role.charAt(0).toUpperCase() +
-                          profileData.role.slice(1)}
+                      <Badge className={getRoleColor(user.role)}>
+                        {user.role.charAt(0).toUpperCase() +
+                          user.role.slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -258,13 +210,13 @@ const Profile = () => {
                       </p>
                       <Badge
                         className={getStatusColor(
-                          profileData.status || "active"
+                          user.status || "active"
                         )}
                       >
-                        {(profileData.status || "active")
+                        {(user.status || "active")
                           .charAt(0)
                           .toUpperCase() +
-                          (profileData.status || "active").slice(1)}
+                          (user.status || "active").slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -278,7 +230,7 @@ const Profile = () => {
                         Client ID
                       </p>
                       <p className="text-gray-900 font-mono text-sm">
-                        {profileData.clientId}
+                        {user.clientId}
                       </p>
                     </div>
                   </div>
@@ -290,8 +242,8 @@ const Profile = () => {
                         Member Since
                       </p>
                       <p className="text-gray-900">
-                        {profileData.accountInfo?.createdAt
-                          ? formatDate(profileData.accountInfo.createdAt)
+                        {user.accountInfo?.createdAt
+                          ? formatDate(user.accountInfo.createdAt)
                           : "N/A"}
                       </p>
                     </div>
@@ -304,8 +256,8 @@ const Profile = () => {
                         Last Login
                       </p>
                       <p className="text-gray-900">
-                        {profileData.accountInfo?.lastLoginAt
-                          ? formatDate(profileData.accountInfo.lastLoginAt)
+                        {user.accountInfo?.lastLoginAt
+                          ? formatDate(user.accountInfo.lastLoginAt)
                           : "Never"}
                       </p>
                     </div>
@@ -349,20 +301,20 @@ const Profile = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Account Type:</span>
-                  <span className="font-medium">{profileData.role}</span>
+                  <span className="font-medium">{user.role}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Status:</span>
                   <Badge
-                    className={getStatusColor(profileData.status || "active")}
+                    className={getStatusColor(user.status || "active")}
                   >
-                    {profileData.status || "active"}
+                    {user.status || "active"}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Client ID:</span>
                   <span className="font-mono text-xs">
-                    {profileData.clientId.slice(0, 8)}...
+                    {user.clientId.slice(0, 8)}...
                   </span>
                 </div>
               </div>

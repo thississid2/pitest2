@@ -7,7 +7,7 @@ interface User {
   clientId: string;
   email: string;
   role: string;
-  permissions?: any;
+  permissions?: string[] | Record<string, unknown>;
   firstName?: string;
   lastName?: string;
   fullName?: string;
