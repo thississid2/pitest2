@@ -3,14 +3,19 @@ env:
   variables:
     NODE_ENV: production
     NEXT_TELEMETRY_DISABLED: 1
+    NODE_OPTIONS: --max_old_space_size=4096
 frontend:
   phases:
     preBuild:
       commands:
-        - npm ci --cache .npm --prefer-offline
+        - echo "Node version:" && node --version
+        - echo "NPM version:" && npm --version
+        - npm ci --cache .npm --prefer-offline --no-audit --no-fund
     build:
       commands:
+        - echo "Building application..."
         - npm run build
+        - echo "Build completed successfully"
   artifacts:
     baseDirectory: .next
     files:

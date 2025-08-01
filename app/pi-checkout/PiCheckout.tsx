@@ -20,7 +20,7 @@ const templates = [
     modified: "2025-01-25",
     category: "minimal",
     type: "template",
-    theme: "light"
+    theme: "light",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const templates = [
     modified: "2025-01-24",
     category: "dark",
     type: "template",
-    theme: "dark"
+    theme: "dark",
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ const templates = [
     modified: "2025-01-23",
     category: "branded",
     type: "template",
-    theme: "light"
+    theme: "light",
   },
   {
     id: 4,
@@ -56,7 +56,7 @@ const templates = [
     modified: "2025-01-22",
     category: "express",
     type: "template",
-    theme: "light"
+    theme: "light",
   },
 ];
 
@@ -66,36 +66,35 @@ const customizationOptions = [
     title: "Colors & Branding",
     description: "Customize colors, fonts, and branding",
     icon: "🎨",
-    status: "available"
+    status: "available",
   },
   {
     id: 2,
     title: "Payment Methods",
     description: "Configure payment options",
     icon: "💳",
-    status: "available"
+    status: "available",
   },
   {
     id: 3,
     title: "Layout & Fields",
     description: "Modify layout and form fields",
     icon: "📐",
-    status: "available"
+    status: "available",
   },
   {
     id: 4,
     title: "Mobile Experience",
     description: "Optimize for mobile devices",
     icon: "📱",
-    status: "available"
-  }
+    status: "available",
+  },
 ];
 
 const TemplatesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All Templates");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
 
   const handleUseTemplate = (templateId: number, templateName: string) => {
     alert(`Using template: ${templateName}`);
@@ -103,7 +102,6 @@ const TemplatesView = () => {
   };
 
   const handlePreviewTemplate = (templateId: number, templateName: string) => {
-    setSelectedTemplate(templateId);
     alert(`Previewing template: ${templateName}`);
     // Here you would typically open a modal with template preview
   };
@@ -127,7 +125,7 @@ const TemplatesView = () => {
       (activeFilter === "Active" && template.status === "active") ||
       (activeFilter === "Draft" && template.status === "draft");
 
-    const matchesCategory = 
+    const matchesCategory =
       selectedCategory === "all" || template.category === selectedCategory;
 
     return matchesSearch && matchesFilter && matchesCategory;
@@ -136,8 +134,8 @@ const TemplatesView = () => {
   const avgConversionRate = "3.4%";
   const bestTemplate = "Express Checkout";
   const totalTemplates = templates.length;
-  const activeTemplates = templates.filter(t => t.status === "active").length;
-  const draftTemplates = templates.filter(t => t.status === "draft").length;
+  const activeTemplates = templates.filter((t) => t.status === "active").length;
+  const draftTemplates = templates.filter((t) => t.status === "draft").length;
 
   return (
     <div className="space-y-6">
@@ -155,23 +153,27 @@ const TemplatesView = () => {
             </div>
           </div>
         </Card>
-        
+
         <Card className="p-6">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Best Performing</p>
             <div className="space-y-1">
               <span className="text-xl font-bold">{bestTemplate}</span>
-              <p className="text-sm text-muted-foreground">4.1% conversion rate</p>
+              <p className="text-sm text-muted-foreground">
+                4.1% conversion rate
+              </p>
             </div>
           </div>
         </Card>
-        
+
         <Card className="p-6">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Total Templates</p>
             <div className="space-y-1">
               <span className="text-2xl font-bold">{totalTemplates}</span>
-              <p className="text-sm text-muted-foreground">{activeTemplates} active, {draftTemplates} draft</p>
+              <p className="text-sm text-muted-foreground">
+                {activeTemplates} active, {draftTemplates} draft
+              </p>
             </div>
           </div>
         </Card>
@@ -180,32 +182,44 @@ const TemplatesView = () => {
       {/* Template Performance Comparison */}
       <Card className="p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Template Performance Comparison</h3>
-          <p className="text-sm text-muted-foreground">Conversion rates by template over the last 30 days</p>
+          <h3 className="text-lg font-semibold">
+            Template Performance Comparison
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Conversion rates by template over the last 30 days
+          </p>
         </div>
         <div className="space-y-3">
           {templates.map((template) => (
-            <div key={template.id} className="flex items-center justify-between py-2">
+            <div
+              key={template.id}
+              className="flex items-center justify-between py-2"
+            >
               <div className="flex items-center space-x-3">
                 <span className="font-medium">{template.name}</span>
-                <Badge 
+                <Badge
                   className={cn(
                     "text-xs",
-                    template.category === "minimal" && "bg-blue-100 text-blue-700",
+                    template.category === "minimal" &&
+                      "bg-blue-100 text-blue-700",
                     template.category === "dark" && "bg-gray-100 text-gray-700",
-                    template.category === "branded" && "bg-purple-100 text-purple-700",
-                    template.category === "express" && "bg-green-100 text-green-700"
+                    template.category === "branded" &&
+                      "bg-purple-100 text-purple-700",
+                    template.category === "express" &&
+                      "bg-green-100 text-green-700"
                   )}
                 >
                   {template.category}
                 </Badge>
               </div>
               <div className="flex items-center space-x-4">
-                <span className="text-lg font-bold text-right">{template.conversion}</span>
-                <Badge 
+                <span className="text-lg font-bold text-right">
+                  {template.conversion}
+                </span>
+                <Badge
                   className={cn(
-                    template.status === "active" 
-                      ? "bg-green-500/20 text-green-700 border-green-500/30" 
+                    template.status === "active"
+                      ? "bg-green-500/20 text-green-700 border-green-500/30"
                       : "bg-yellow-500/20 text-yellow-700 border-yellow-500/30"
                   )}
                 >
@@ -239,8 +253,8 @@ const TemplatesView = () => {
               onClick={() => setActiveFilter(filter)}
               className={cn(
                 "text-sm px-3 py-2",
-                activeFilter === filter 
-                  ? "bg-primary text-primary-foreground" 
+                activeFilter === filter
+                  ? "bg-primary text-primary-foreground"
                   : "bg-background border hover:bg-muted"
               )}
             />
@@ -255,7 +269,7 @@ const TemplatesView = () => {
           { value: "minimal", label: "Minimal" },
           { value: "dark", label: "Dark Theme" },
           { value: "branded", label: "Branded" },
-          { value: "express", label: "Express" }
+          { value: "express", label: "Express" },
         ].map((category) => (
           <button
             key={category.value}
@@ -286,10 +300,14 @@ const TemplatesView = () => {
                   <Badge
                     className={cn(
                       "text-xs",
-                      template.category === "minimal" && "bg-blue-100 text-blue-700",
-                      template.category === "dark" && "bg-gray-100 text-gray-700",
-                      template.category === "branded" && "bg-purple-100 text-purple-700",
-                      template.category === "express" && "bg-green-100 text-green-700"
+                      template.category === "minimal" &&
+                        "bg-blue-100 text-blue-700",
+                      template.category === "dark" &&
+                        "bg-gray-100 text-gray-700",
+                      template.category === "branded" &&
+                        "bg-purple-100 text-purple-700",
+                      template.category === "express" &&
+                        "bg-green-100 text-green-700"
                     )}
                   >
                     {template.category}
@@ -317,13 +335,15 @@ const TemplatesView = () => {
                 </div>
                 <p className="text-sm font-medium">Template Preview</p>
               </div>
-              
+
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button 
-                  text="Preview" 
-                  className="bg-white text-black hover:bg-gray-100" 
-                  onClick={() => handlePreviewTemplate(template.id, template.name)}
+                <Button
+                  text="Preview"
+                  className="bg-white text-black hover:bg-gray-100"
+                  onClick={() =>
+                    handlePreviewTemplate(template.id, template.name)
+                  }
                 />
               </div>
             </div>
@@ -331,7 +351,11 @@ const TemplatesView = () => {
             {/* Features */}
             <div className="flex flex-wrap gap-2 mb-4">
               {template.features.map((feature) => (
-                <Badge key={feature} variant="outline" className="text-xs hover:bg-primary/10 transition-colors">
+                <Badge
+                  key={feature}
+                  variant="outline"
+                  className="text-xs hover:bg-primary/10 transition-colors"
+                >
                   {feature}
                 </Badge>
               ))}
@@ -350,14 +374,16 @@ const TemplatesView = () => {
 
             {/* Actions */}
             <div className="flex gap-2 mt-auto">
-              <Button 
-                text="Use Template" 
-                className="flex-1 group-hover:bg-primary/90 transition-colors" 
+              <Button
+                text="Use Template"
+                className="flex-1 group-hover:bg-primary/90 transition-colors"
                 onClick={() => handleUseTemplate(template.id, template.name)}
               />
-              <button 
+              <button
                 className="p-2 border rounded-md hover:bg-muted transition-colors hover:border-primary"
-                onClick={() => handlePreviewTemplate(template.id, template.name)}
+                onClick={() =>
+                  handlePreviewTemplate(template.id, template.name)
+                }
               >
                 <Eye size={20} />
               </button>
@@ -396,15 +422,22 @@ const CustomizationView = () => {
       {/* Customization Options Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {customizationOptions.map((option) => (
-          <Card key={option.id} className="p-8 hover:shadow-lg transition-shadow group">
+          <Card
+            key={option.id}
+            className="p-8 hover:shadow-lg transition-shadow group"
+          >
             <div className="flex items-start space-x-4">
-              <div className="text-4xl group-hover:scale-110 transition-transform">{option.icon}</div>
+              <div className="text-4xl group-hover:scale-110 transition-transform">
+                {option.icon}
+              </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2">{option.title}</h3>
-                <p className="text-muted-foreground mb-4">{option.description}</p>
-                <Button 
-                  text="Customize" 
-                  className="w-full" 
+                <p className="text-muted-foreground mb-4">
+                  {option.description}
+                </p>
+                <Button
+                  text="Customize"
+                  className="w-full"
                   onClick={() => handleCustomizeOption(option.title)}
                 />
               </div>
@@ -416,8 +449,10 @@ const CustomizationView = () => {
       {/* Live Preview Section */}
       <Card className="p-8">
         <h3 className="text-xl font-semibold mb-4">Live Preview</h3>
-        <p className="text-muted-foreground mb-6">See how your checkout will look on different devices</p>
-        
+        <p className="text-muted-foreground mb-6">
+          See how your checkout will look on different devices
+        </p>
+
         <div className="flex justify-center space-x-4 mb-6">
           {["Desktop", "Tablet", "Mobile"].map((device) => (
             <button
@@ -425,8 +460,8 @@ const CustomizationView = () => {
               onClick={() => setSelectedDevice(device)}
               className={cn(
                 "px-4 py-2 rounded-md border transition-colors",
-                selectedDevice === device 
-                  ? "bg-primary text-primary-foreground border-primary" 
+                selectedDevice === device
+                  ? "bg-primary text-primary-foreground border-primary"
                   : "hover:bg-muted"
               )}
             >
@@ -441,8 +476,12 @@ const CustomizationView = () => {
             <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Eye size={32} className="text-primary" />
             </div>
-            <h4 className="text-lg font-medium mb-2">Live Preview - {selectedDevice}</h4>
-            <p className="text-muted-foreground">Select a template to see preview</p>
+            <h4 className="text-lg font-medium mb-2">
+              Live Preview - {selectedDevice}
+            </h4>
+            <p className="text-muted-foreground">
+              Select a template to see preview
+            </p>
           </div>
         </div>
       </Card>
@@ -460,7 +499,7 @@ const PerformanceView = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <h2 className="text-2xl font-bold">Performance Analytics</h2>
         <div className="flex space-x-4">
-          <select 
+          <select
             value={selectedTimeRange}
             onChange={(e) => setSelectedTimeRange(e.target.value)}
             className="px-3 py-2 border rounded-md"
@@ -470,7 +509,7 @@ const PerformanceView = () => {
             <option value="90 days">Last 90 days</option>
             <option value="1 year">Last year</option>
           </select>
-          <select 
+          <select
             value={selectedMetric}
             onChange={(e) => setSelectedMetric(e.target.value)}
             className="px-3 py-2 border rounded-md"
@@ -495,10 +534,12 @@ const PerformanceView = () => {
                 <span>+0.5%</span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">vs last {selectedTimeRange}</p>
+            <p className="text-xs text-muted-foreground">
+              vs last {selectedTimeRange}
+            </p>
           </div>
         </Card>
-        
+
         <Card className="p-6 hover:shadow-lg transition-shadow">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Total Checkouts</p>
@@ -506,7 +547,7 @@ const PerformanceView = () => {
             <p className="text-xs text-green-600">+15.3% increase</p>
           </div>
         </Card>
-        
+
         <Card className="p-6 hover:shadow-lg transition-shadow">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Successful Payments</p>
@@ -514,7 +555,7 @@ const PerformanceView = () => {
             <p className="text-xs text-green-600">+18.2% increase</p>
           </div>
         </Card>
-        
+
         <Card className="p-6 hover:shadow-lg transition-shadow">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Abandonment Rate</p>
@@ -525,7 +566,9 @@ const PerformanceView = () => {
                 <span>-1.2%</span>
               </div>
             </div>
-            <p className="text-xs text-green-600">Improvement from last period</p>
+            <p className="text-xs text-green-600">
+              Improvement from last period
+            </p>
           </div>
         </Card>
       </div>
@@ -534,15 +577,24 @@ const PerformanceView = () => {
       <Card className="p-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Conversion Trends</h3>
-          <p className="text-sm text-muted-foreground">Template performance over {selectedTimeRange}</p>
+          <p className="text-sm text-muted-foreground">
+            Template performance over {selectedTimeRange}
+          </p>
         </div>
-        
+
         <div className="h-64 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="text-center z-10">
-            <TrendingUp size={48} className="text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Performance chart for {selectedMetric} will be displayed here</p>
-            <p className="text-sm text-muted-foreground mt-2">Time range: {selectedTimeRange}</p>
+            <TrendingUp
+              size={48}
+              className="text-muted-foreground mx-auto mb-4"
+            />
+            <p className="text-muted-foreground">
+              Performance chart for {selectedMetric} will be displayed here
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Time range: {selectedTimeRange}
+            </p>
           </div>
         </div>
       </Card>
@@ -551,9 +603,11 @@ const PerformanceView = () => {
       <Card className="p-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Template Comparison</h3>
-          <p className="text-muted-foreground">Compare performance across all templates</p>
+          <p className="text-muted-foreground">
+            Compare performance across all templates
+          </p>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -568,13 +622,21 @@ const PerformanceView = () => {
             </thead>
             <tbody>
               {templates.map((template) => (
-                <tr key={template.id} className="border-b hover:bg-muted/50 transition-colors">
+                <tr
+                  key={template.id}
+                  className="border-b hover:bg-muted/50 transition-colors"
+                >
                   <td className="py-3 px-4 font-medium">{template.name}</td>
                   <td className="py-3 px-4">
                     <span className="font-semibold">{template.conversion}</span>
                   </td>
-                  <td className="py-3 px-4">{Math.floor(Math.random() * 5000 + 1000).toLocaleString()}</td>
-                  <td className="py-3 px-4">${Math.floor(Math.random() * 50000 + 10000).toLocaleString()}</td>
+                  <td className="py-3 px-4">
+                    {Math.floor(Math.random() * 5000 + 1000).toLocaleString()}
+                  </td>
+                  <td className="py-3 px-4">
+                    $
+                    {Math.floor(Math.random() * 50000 + 10000).toLocaleString()}
+                  </td>
                   <td className="py-3 px-4">
                     <Badge
                       className={cn(
@@ -621,14 +683,18 @@ const PiCheckout = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <button 
+          <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center px-4 py-2 border rounded-lg text-sm hover:bg-muted transition-colors"
           >
             <Filter size={16} className="mr-2" />
             Filter
           </button>
-          <Button text="+ New Template" className="px-6 py-2" onClick={handleNewTemplate} />
+          <Button
+            text="+ New Template"
+            className="px-6 py-2"
+            onClick={handleNewTemplate}
+          />
         </div>
       </div>
 
@@ -637,7 +703,7 @@ const PiCheckout = () => {
         <Card className="p-6 mb-8 border-2 border-dashed border-primary/30 bg-primary/5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Filters</h3>
-            <button 
+            <button
               onClick={() => setShowFilters(false)}
               className="text-muted-foreground hover:text-foreground"
             >
@@ -654,7 +720,9 @@ const PiCheckout = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Performance</label>
+              <label className="block text-sm font-medium mb-2">
+                Performance
+              </label>
               <select className="w-full p-2 border rounded-md">
                 <option>All Performance</option>
                 <option>High (&gt;3.5%)</option>
@@ -663,7 +731,9 @@ const PiCheckout = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Last Modified</label>
+              <label className="block text-sm font-medium mb-2">
+                Last Modified
+              </label>
               <select className="w-full p-2 border rounded-md">
                 <option>Any Time</option>
                 <option>Last 7 days</option>
