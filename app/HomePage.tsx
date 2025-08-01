@@ -1,6 +1,9 @@
 // import Button  from "@/components/ui/button";
 // import Image from "next/image";
 
+"use client";
+
+import { useState, useEffect } from "react";
 import PaymentMethodsDoughnutChart from "@/components/graphs/paymentMethodsDoughnutChart";
 import TodayActivityBarGraph from "@/components/graphs/todayActivityBarGraph";
 import TransactionsTrends from "@/components/graphs/transactionsTrends";
@@ -13,45 +16,89 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const transactions = [
-  {
-    id: "TXN001",
-    date: "28/01/2025, 16:00:00",
-    method: "Stripe",
-    amount: "$300",
-    status: "success",
-  },
-  {
-    id: "TXN002",
-    date: "28/01/2025, 15:55:00",
-    method: "PayPal",
-    amount: "$150",
-    status: "success",
-  },
-  {
-    id: "TXN003",
-    date: "28/01/2025, 15:50:00",
-    method: "Adyen",
-    amount: "$90",
-    status: "failed",
-  },
-  {
-    id: "TXN004",
-    date: "28/01/2025, 15:45:00",
-    method: "Stripe",
-    amount: "$599",
-    status: "success",
-  },
-  {
-    id: "TXN005",
-    date: "28/01/2025, 15:40:00",
-    method: "Square",
-    amount: "$200",
-    status: "pending",
-  },
-];
+interface Transaction {
+  id: string;
+  checkout_id: string;
+  client_id: string;
+  payment_method: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  status: string;
+  amount: number;
+  currency: string;
+  created_by: string;
+  notes: string;
+  credit_card_id: string;
+  provider_id: string;
+  customer_ip: string;
+  provider_transaction_id: string;
+  provider_reference_id: string;
+  fraud_score: number | null;
+  processing_fee: number | null;
+  user_agent: string;
+  error_code: string | null;
+  error_message: string | null;
+}
+
+interface TransactionResponse {
+  status: string;
+  count: number;
+  transactions: Transaction[];
+}
 
 export default function Home() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "https://api.payintelli.com/api/transactions/latest-transactions"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+      const data: TransactionResponse = await response.json();
+      setTransactions(data.transactions);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const formatAmount = (amount: number, currency: string) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  };
+
+  const getProviderName = (providerId: string) => {
+    return (
+      providerId.replace("provider_", "").charAt(0).toUpperCase() +
+      providerId.replace("provider_", "").slice(1)
+    );
+  };
   return (
     <>
       <div className="flex justify-between mb-4 ml-1 sm:ml-2">
@@ -63,7 +110,10 @@ export default function Home() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-3 font-semibold border border-gray-300 bg-white text-foreground px-4 py-2 rounded-md shadow-sm hover:bg-gray-50 transition-colors text-sm">
+          <button
+            onClick={fetchTransactions}
+            className="flex items-center gap-3 font-semibold border border-gray-300 bg-white text-foreground px-4 py-2 rounded-md shadow-sm hover:bg-gray-50 transition-colors text-sm"
+          >
             <RefreshCcw className="w-4 h-4" /> Refresh
           </button>
           <button className="bg-foreground text-white font-semibold px-4 py-2 rounded-md shadow-sm hover:bg-gray-900 transition-colors text-sm">
@@ -127,45 +177,59 @@ export default function Home() {
           subtitle="Latest payment transactions and their status"
           className="flex-3/2"
         >
-          {transactions.map((txn) => (
-            <Card key={txn.id} className="mb-4">
-              <div className="flex items-center gap-4">
-                <span
-                  className={
-                    `h-2 w-2 rounded-full ` +
-                    (txn.status === "success"
-                      ? "bg-green-500"
-                      : txn.status === "failed"
-                      ? "bg-red-500"
-                      : "bg-yellow-400")
-                  }
-                ></span>
-                <div className="flex items-center w-full">
-                  <div>
-                    <h3 className="font-bold text-md">{txn.id}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {txn.date} &bull; {txn.method}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end ml-auto">
-                    <p className="text-right font-bold">{txn.amount}</p>
-                    <span
-                      className={
-                        `rounded-md px-3 py-1 text-xs font-bold mt-2 ` +
-                        (txn.status === "success"
-                          ? "bg-black text-white"
-                          : txn.status === "failed"
-                          ? "bg-red-500 text-white"
-                          : "bg-gray-200 text-gray-700")
-                      }
-                    >
-                      {txn.status}
-                    </span>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">
+                Loading transactions...
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-red-500">Error: {error}</div>
+            </div>
+          ) : (
+            transactions.map((txn) => (
+              <Card key={txn.id} className="mb-4">
+                <div className="flex items-center gap-4">
+                  <span
+                    className={
+                      `h-2 w-2 rounded-full ` +
+                      (txn.status === "SUCCESS"
+                        ? "bg-green-500"
+                        : txn.status === "FAILED"
+                        ? "bg-red-500"
+                        : "bg-yellow-400")
+                    }
+                  ></span>
+                  <div className="flex items-center w-full">
+                    <div>
+                      <h3 className="font-bold text-md">{txn.id}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(txn.created_at)}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end ml-auto">
+                      <p className="text-right font-bold">
+                        {formatAmount(txn.amount, txn.currency)}
+                      </p>
+                      <span
+                        className={
+                          `rounded-md px-3 py-1 text-xs font-bold mt-2 ` +
+                          (txn.status === "SUCCESS"
+                            ? "bg-black text-white"
+                            : txn.status === "FAILED"
+                            ? "bg-red-500 text-white"
+                            : "bg-gray-200 text-gray-700")
+                        }
+                      >
+                        {txn.status.toLowerCase()}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          )}
         </Card>
         <Card
           title="Payment Methods"
