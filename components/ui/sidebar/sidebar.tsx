@@ -142,7 +142,7 @@ const Sidebar = () => {
           collapsed ? "w-15 items-center" : "w-64"
         )}
       >
-        <div className="p-3 shadow-sm">
+        <div className="shrink-0 p-3 border-b">
           {!collapsed ? (
             <>
               <Image
@@ -206,7 +206,7 @@ const Sidebar = () => {
                 "Pi Symphony",
                 "/pi-symphony",
                 Music,
-                "AI-Powered data analysis"
+                "AI-Powered Orchestration Engine"
               )}
               {renderNavItem(
                 "Pi Shield",
@@ -218,13 +218,13 @@ const Sidebar = () => {
                 "Pi Recon",
                 "/pi-recon",
                 GitBranch,
-                "Reconciliation and Settlement Tools"
+                "AI-Powered Reconciliation Module"
               )}
               {renderNavItem(
                 "Pi Deepsearch",
                 "/pi-deepsearch",
                 Search,
-                "Business AI Chat"
+                "AI-Powered Conversational Analytics"
               )}
             </div>
           </div>
@@ -260,7 +260,7 @@ const Sidebar = () => {
 
         <Divider />
 
-        <div className="p-3">
+        <div className="shrink-0 p-3">
           <div className="flex flex-col gap-1.5">
             {renderNavItem("Settings", "/settings", Settings)}
             {renderNavItem("Profile", "/profile", UserCircle)}
