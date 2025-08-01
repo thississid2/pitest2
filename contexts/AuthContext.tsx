@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem("auth-token");
-      
+
       if (!token) {
         setUser(null);
         setIsAuthenticated(false);
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       const token = localStorage.getItem("auth-token");
-      
+
       if (token) {
         await fetch(
           "https://jxnnviamig.execute-api.ap-south-1.amazonaws.com/logout",

@@ -17,7 +17,12 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const { logout, fetchProfile: authFetchProfile, user, isLoading: authLoading } = useAuth();
+  const {
+    logout,
+    fetchProfile: authFetchProfile,
+    user,
+    isLoading: authLoading,
+  } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -196,8 +201,7 @@ const Profile = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-500">Role</p>
                       <Badge className={getRoleColor(user.role)}>
-                        {user.role.charAt(0).toUpperCase() +
-                          user.role.slice(1)}
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -209,13 +213,9 @@ const Profile = () => {
                         Account Status
                       </p>
                       <Badge
-                        className={getStatusColor(
-                          user.status || "active"
-                        )}
+                        className={getStatusColor(user.status || "active")}
                       >
-                        {(user.status || "active")
-                          .charAt(0)
-                          .toUpperCase() +
+                        {(user.status || "active").charAt(0).toUpperCase() +
                           (user.status || "active").slice(1)}
                       </Badge>
                     </div>
@@ -305,9 +305,7 @@ const Profile = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Status:</span>
-                  <Badge
-                    className={getStatusColor(user.status || "active")}
-                  >
+                  <Badge className={getStatusColor(user.status || "active")}>
                     {user.status || "active"}
                   </Badge>
                 </div>
